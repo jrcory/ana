@@ -9,6 +9,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from matplotlib.patches import Ellipse
 
+##analysis of the results of cluster.py, makes plots of events by cluster 
+
 #set output file 
 pdf = PdfPages("cluster.pdf")
 ##get pca data and split into pca and clusters 
@@ -69,7 +71,9 @@ for i in range(len(pca)-1):
         if plt_cnt<plot_lim:
             f=plt.figure(plt_cnt)
             plt.plot(x_ax,X[i])
-            plt.ylim(-0.5,6)
+            ax=plt.gca()
+            plt.ylim(-1,6)
+            
             f.show()
 print(len(X))
 print(len(cl))
@@ -81,7 +85,7 @@ for j in range(10):
         if cl[i]==j:
                 g=plt.figure()
                 plt.plot(x_ax,X[i]-1)
-                plt.ylim(0,6)
+                plt.ylim(-1.5,6)
                 plt.title("Cluster"+str(cl[i]))
                 pdf.savefig(g)
                 plt.close()

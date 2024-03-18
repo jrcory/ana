@@ -27,12 +27,12 @@ x_ax=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
 
 x = StandardScaler().fit_transform(X)
-pca = PCA(n_components=2)
+pca = PCA(n_components=3)
 
 principalComponents = pca.fit_transform(X)
 print(len(X))
 #tar=pd.DataFrame(data=y, columns=['targets'])
-principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2'])
+principalDf = pd.DataFrame(data = principalComponents, columns = ['principal component 1', 'principal component 2','principal component 3'])
 #finalDf = pd.concat([principalDf, tar], axis = 1)
 
 
@@ -43,10 +43,13 @@ K=10
 
 # Select random observation as centroids
 Centroids = (principalDf.sample(n=K))
-plt.scatter(principalDf["principal component 1"],principalDf["principal component 2"],c='black')
-plt.scatter(Centroids["principal component 1"],Centroids["principal component 2"],c='red')
-plt.xlabel('principal component 1')
-plt.ylabel('principal component 2')
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.scatter(principalDf["principal component 1"],principalDf["principal component 2"],principalDf["principal component 3"],c='black')
+ax.scatter(Centroids["principal component 1"],Centroids["principal component 2"],Centroids["principal component 2"],c='red')
+ax.set_xlabel('principal component 1')
+ax.set_ylabel('principal component 2')
+ax.set_zlabel('principal component 2')
 plt.show()
 
 # Step 3 - Assign all the points to the closest cluster centroid
@@ -65,7 +68,8 @@ while(diff!=0):
         for index2,row_d in XD.iterrows():
             d1=(row_c["principal component 1"]-row_d["principal component 1"])**2
             d2=(row_c["principal component 2"]-row_d["principal component 2"])**2
-            d=np.sqrt(d1+d2)
+            d3=(row_c["principal component 3"]-row_d["principal component 3"])**2
+            d=np.sqrt(d1+d2+d3)
             ED.append(d)
         principalDf[i]=ED
         i=i+1
@@ -81,24 +85,27 @@ while(diff!=0):
                 pos=i+1
         C.append(pos)
     principalDf["Cluster"]=C
-    Centroids_new = principalDf.groupby(["Cluster"]).mean()[["principal component 1","principal component 2"]]
+    Centroids_new = principalDf.groupby(["Cluster"]).mean()[["principal component 1","principal component 2","principal component 3"]]
     if j == 0:
         diff=1
         j=j+1
     else:
-        diff = (Centroids_new['principal component 2'] - Centroids['principal component 2']).sum() + (Centroids_new['principal component 1'] - Centroids['principal component 1']).sum()
+        diff = (Centroids_new['principal component 2'] - Centroids['principal component 2']).sum() + (Centroids_new['principal component 1'] - Centroids['principal component 1']).sum()+ (Centroids_new['principal component 3'] - Centroids['principal component 3']).sum()
         print(diff.sum())
-    Centroids = principalDf.groupby(["Cluster"]).mean()[["principal component 2","principal component 1"]]
+    Centroids = principalDf.groupby(["Cluster"]).mean()[["principal component 3", "principal component 2","principal component 1"]]
 
 color=['blue','green','cyan','pink','orange','yellow','black','purple','brown','lightcoral']
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(projection='3d')
 for k in range(K):
     data=principalDf[principalDf["Cluster"]==k+1]
-    plt.scatter(data["principal component 1"],data["principal component 2"],c=color[k])
-plt.scatter(Centroids["principal component 1"],Centroids["principal component 2"],c='red')
+    ax2.scatter(data["principal component 1"],data["principal component 2"],data["principal component 3"],c=color[k])
+ax2.scatter(Centroids["principal component 1"],Centroids["principal component 2"],Centroids["principal component 3"],c='red')
 plt.xlabel('principal component 1')
 plt.ylabel('principal component 2')
 plt.show()
 
+'''''
 chose = input("which color ")
 chose=int(chose)
 data1=principalDf[principalDf["Cluster"]==chose]
@@ -109,4 +116,5 @@ for j in range(len(data1)):
         plt.ylim(0,6)
         plt.show()
 
-principalDf.to_csv('cluster_result.csv')
+'''
+#principalDf.to_csv('cluster_result_v2.csv')
